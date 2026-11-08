@@ -6,14 +6,16 @@ import { Presenze } from './pages/Presenze';
 import { Contratto } from './pages/Contratto';
 import { SpeseMediche } from './pages/SpeseMediche';
 import { Checklist730 } from './pages/Checklist730';
+import { Routine } from './pages/Routine';
 import { Scadenzario } from './pages/Scadenzario';
 import { Dashboard } from './pages/Dashboard';
 import { Export } from './pages/Export';
 
-type Pagina = 'dashboard' | 'profilo' | 'cedolini' | 'presenze' | 'contratto' | 'spese' | 'checklist' | 'scadenzario' | 'export';
+type Pagina = 'dashboard' | 'routine' | 'profilo' | 'cedolini' | 'presenze' | 'contratto' | 'spese' | 'checklist' | 'scadenzario' | 'export';
 
 const VOCI_MENU: { id: Pagina; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'routine', label: 'La tua routine' },
   { id: 'profilo', label: '1. Profilo' },
   { id: 'cedolini', label: '2. Cedolini' },
   { id: 'presenze', label: '3. Presenze' },
@@ -41,6 +43,7 @@ function App() {
       </aside>
       <main className="main-content">
         {pagina === 'dashboard' && <Dashboard />}
+        {pagina === 'routine' && <Routine />}
         {pagina === 'profilo' && <Profilo />}
         {pagina === 'cedolini' && <Cedolini />}
         {pagina === 'presenze' && <Presenze />}

@@ -22,13 +22,27 @@ export function analizzaCedolino(
   }
 
   // 1. Retribuzione base vs minimo CCNL
-  const verificaBase = verificaRetribuzioneBase(profilo.livello, cedolino.retribuzioneBase);
-  if (verificaBase.esito !== 'ok') {
-    anomalie.push(verificaBase.messaggio);
+  // Se il cedolino è relativo al mese di assunzione, la retribuzione è fisiologicamente prorata
+  // sui giorni lavorati: il confronto diretto col minimo mensile pieno darebbe un falso allarme.
+  const meseDiAssunzione = profilo.dataAssunzione
+    ? (() => {
+        const d = new Date(profilo.dataAssunzione);
+        return d.getFullYear() === cedolino.anno && d.getMonth() + 1 === cedolino.mese;
+      })()
+    : false;
+  if (meseDiAssunzione) {
+    anomalie.push(
+      `Retribuzione base di €${cedolino.retribuzioneBase.toFixed(2)}: mese di assunzione, importo fisiologicamente ridotto per i giorni effettivamente lavorati. Il confronto col minimo CCNL pieno non si applica a questo mese.`,
+    );
+  } else {
+    const verificaBase = verificaRetribuzioneBase(profilo.livello, cedolino.retribuzioneBase);
+    if (verificaBase.esito !== 'ok') {
+      anomalie.push(verificaBase.messaggio);
+    }
   }
 
-  // 2. Contributi INPS
-  const imponibileContributivo = cedolino.imponibileFiscaleMese || cedolino.totaleCompetenze;
+  // 2. Contributi INPS (sulla base contributiva, che spesso differisce da quella fiscale)
+  const imponibileContributivo = cedolino.imponibileContributivoMese || cedolino.imponibileFiscaleMese || cedolino.totaleCompetenze;
   const confrontoInps = confrontaContributiInps(imponibileContributivo, cedolino.contributiInps);
   if (!confrontoInps.entroTolleranza) {
     anomalie.push(confrontoInps.messaggio);

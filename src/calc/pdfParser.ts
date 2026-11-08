@@ -31,6 +31,7 @@ export interface CampiEstrattiCedolino {
   nettoPagato?: number;
   tfrMaturatoMese?: number;
   imponibileFiscaleMese?: number;
+  imponibileContributivoMese?: number;
   imponibileFiscaleCumulato?: number;
   addizionaliRegionaliComunali?: number;
   irpefCumulata?: number;
@@ -155,6 +156,11 @@ export function estraiCampiCedolino(testoPdf: string): CampiEstrattiCedolino {
   ]);
   if (imponibileFiscaleMese === undefined) campiNonTrovati.push('imponibileFiscaleMese');
 
+  const imponibileContributivoMese = cercaImportoVicinoChiave(testoPdf, [
+    'imponibile previdenziale', 'imponibile inps', 'imponibile contributivo',
+  ]);
+  if (imponibileContributivoMese === undefined) campiNonTrovati.push('imponibileContributivoMese (spesso diverso dall\'imponibile fiscale: verifica sulla riga INPS-FPLD/IVS del cedolino)');
+
   const imponibileFiscaleCumulato = cercaImportoVicinoChiave(testoPdf, [
     'imponibile fiscale progressivo', 'imponibile fiscale cumulato', 'progressivo imponibile',
     'imponibile fiscale totale', 'cumulo imponibile fiscale',
@@ -182,6 +188,7 @@ export function estraiCampiCedolino(testoPdf: string): CampiEstrattiCedolino {
     nettoPagato,
     tfrMaturatoMese,
     imponibileFiscaleMese,
+    imponibileContributivoMese,
     imponibileFiscaleCumulato,
     irpefCumulata,
     addizionaliRegionaliComunali,

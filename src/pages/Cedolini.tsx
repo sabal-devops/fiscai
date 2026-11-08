@@ -26,6 +26,7 @@ function cedolinoVuoto(): Cedolino {
     tfrAccantonatoCumulato: 0,
     imponibileFiscaleCumulato: 0,
     imponibileFiscaleMese: 0,
+    imponibileContributivoMese: 0,
     irpefCumulata: 0,
     vociGrezze: [],
     fontePdf: false,
@@ -69,6 +70,7 @@ export function Cedolini() {
       if (campi.nettoPagato !== undefined) nuovo.nettoPagato = campi.nettoPagato;
       if (campi.tfrMaturatoMese !== undefined) nuovo.tfrMaturatoMese = campi.tfrMaturatoMese;
       if (campi.imponibileFiscaleMese !== undefined) nuovo.imponibileFiscaleMese = campi.imponibileFiscaleMese;
+      if (campi.imponibileContributivoMese !== undefined) nuovo.imponibileContributivoMese = campi.imponibileContributivoMese;
       if (campi.imponibileFiscaleCumulato !== undefined) nuovo.imponibileFiscaleCumulato = campi.imponibileFiscaleCumulato;
       if (campi.irpefCumulata !== undefined) nuovo.irpefCumulata = campi.irpefCumulata;
       if (campi.addizionaliRegionaliComunali !== undefined) nuovo.addizionaliRegionaliComunali = campi.addizionaliRegionaliComunali;
@@ -223,6 +225,10 @@ export function Cedolini() {
             <div className="field">
               <label>Imponibile fiscale cumulato (€)</label>
               <input type="number" value={form.imponibileFiscaleCumulato} onChange={(e) => aggiornaForm('imponibileFiscaleCumulato', parseFloat(e.target.value) || 0)} />
+            </div>
+            <div className="field">
+              <label>Imponibile contributivo (INPS) del mese (€)</label>
+              <input type="number" value={form.imponibileContributivoMese} onChange={(e) => aggiornaForm('imponibileContributivoMese', parseFloat(e.target.value) || 0)} />
             </div>
             <div className="field">
               <label>Addizionali regionali/comunali trattenute (€)</label>

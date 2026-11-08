@@ -73,6 +73,7 @@ export interface Cedolino {
   tfrAccantonatoCumulato: number;
   imponibileFiscaleCumulato: number; // da inizio anno
   imponibileFiscaleMese: number;
+  imponibileContributivoMese: number; // base INPS del mese: spesso diversa dall'imponibile fiscale (es. per il F.do sanitario)
   irpefCumulata: number; // trattenuta cumulata da inizio anno
   vociGrezze: VoceCedolino[]; // tutte le voci letti dal PDF o inserite manualmente
   fontePdf: boolean;

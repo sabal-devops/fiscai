@@ -10,7 +10,7 @@ import type {
 } from './types';
 
 const DB_NAME = 'fiscai-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -18,6 +18,9 @@ function getDb(): Promise<IDBPDatabase> {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
       upgrade(db) {
+        if (!db.objectStoreNames.contains('routineCompletamenti')) {
+          db.createObjectStore('routineCompletamenti');
+        }
         if (!db.objectStoreNames.contains('profilo')) {
           db.createObjectStore('profilo');
         }
@@ -175,6 +178,27 @@ export async function getImpostazioni(): Promise<ImpostazioniApp> {
 export async function salvaImpostazioni(imp: ImpostazioniApp): Promise<void> {
   const db = await getDb();
   await db.put('impostazioni', imp, 'singleton');
+}
+
+// --- Stato completamento voci "Routine" (chiave libera, es. "carica_cedolino-2026-10") ---
+export async function getCompletamentoRoutine(chiave: string): Promise<boolean> {
+  const db = await getDb();
+  const valore = await db.get('routineCompletamenti', chiave);
+  return !!valore;
+}
+
+export async function setCompletamentoRoutine(chiave: string, completato: boolean): Promise<void> {
+  const db = await getDb();
+  if (completato) {
+    await db.put('routineCompletamenti', true, chiave);
+  } else {
+    await db.delete('routineCompletamenti', chiave);
+  }
+}
+
+export async function listaCompletamentiRoutine(): Promise<string[]> {
+  const db = await getDb();
+  return db.getAllKeys('routineCompletamenti') as Promise<string[]>;
 }
 
 // --- Export/Import completo (per backup manuale) ---
