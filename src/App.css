@@ -1,0 +1,191 @@
+:root {
+  --bg: #0f1420;
+  --bg-elevated: #171d2e;
+  --border: #2a3350;
+  --text: #e8ecf5;
+  --text-dim: #9aa5c0;
+  --accent: #5b8cff;
+  --ok: #3ecf8e;
+  --warn: #f0b429;
+  --danger: #ef5a6f;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar h1 {
+  font-size: 18px;
+  padding: 0 16px 16px;
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.sidebar nav button.active {
+  color: var(--text);
+  background: rgba(91, 140, 255, 0.12);
+  border-right: 2px solid var(--accent);
+}
+
+.sidebar nav button:hover { color: var(--text); }
+
+.main-content {
+  flex: 1;
+  padding: 24px 32px;
+  max-width: 1100px;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.card h2 { margin-top: 0; font-size: 17px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 12px 20px;
+}
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 12px; color: var(--text-dim); }
+.field input, .field select, .field textarea {
+  background: #0c111c;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 10px;
+  font-size: 14px;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+button.primary {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+button.primary:hover { opacity: 0.9; }
+
+button.secondary {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+button.secondary:hover { color: var(--text); border-color: var(--accent); }
+
+button.danger-text {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+table th, table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+table th { color: var(--text-dim); font-weight: 500; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge.ok { background: rgba(62, 207, 142, 0.15); color: var(--ok); }
+.badge.warn { background: rgba(240, 180, 41, 0.15); color: var(--warn); }
+.badge.danger { background: rgba(239, 90, 111, 0.15); color: var(--danger); }
+
+.anomalia {
+  background: rgba(240, 180, 41, 0.08);
+  border-left: 3px solid var(--warn);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+
+.formula {
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: #0c111c;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.row-actions { display: flex; gap: 8px; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+.stat-box {
+  background: #0c111c;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.stat-box .label { font-size: 12px; color: var(--text-dim); }
+.stat-box .value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+
+.empty-state {
+  color: var(--text-dim);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 12px; }

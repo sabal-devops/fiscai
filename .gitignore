@@ -1,0 +1,36 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Mai committare dati personali: cedolini, contratti, backup o export generati dall'app.
+# L'app non salva nulla qui di propria iniziativa (tutto resta nel browser), ma queste regole
+# proteggono da un salvataggio manuale accidentale nella cartella del progetto.
+*.pdf
+*.docx
+fiscai_backup_*.json
+fiscai_report_*.pdf
+cedolini_*.csv
+/backup/
+/export/
+/dati-personali/
