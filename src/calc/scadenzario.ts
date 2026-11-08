@@ -10,6 +10,8 @@ export function generaScadenzeStandard(anno: number): Scadenza[] {
     {
       titolo: 'Consultazione Certificazione Unica (CU)',
       descrizione: 'Il datore di lavoro deve rilasciare la CU con i redditi dell\'anno precedente, necessaria per il 730.',
+      azione: 'Scarica la CU dal portale HR aziendale (o chiedila all\'ufficio del personale) e caricala nel Modulo 4 di FiscAI per averla sempre a disposizione.',
+      destinatario: 'La ricevi dal tuo datore di lavoro (Accenture, portale HR); non va consegnata a nessuno a questo punto.',
       dataScadenza: `${anno}-03-16`,
       ricorrenzaAnnuale: true,
       anticipiGiorni: [15, 7],
@@ -18,6 +20,8 @@ export function generaScadenzeStandard(anno: number): Scadenza[] {
     {
       titolo: 'Apertura 730 precompilato',
       descrizione: 'L\'Agenzia delle Entrate rende disponibile il 730 precompilato nel Cassetto Fiscale.',
+      azione: 'Accedi al Cassetto Fiscale e controlla che i dati precompilati (redditi, spese mediche) corrispondano a quelli che hai registrato in FiscAI.',
+      destinatario: 'Cassetto Fiscale dell\'Agenzia delle Entrate (accesso con SPID/CIE su agenziaentrate.gov.it).',
       dataScadenza: `${anno}-04-30`,
       ricorrenzaAnnuale: true,
       anticipiGiorni: [15, 7],
@@ -26,6 +30,8 @@ export function generaScadenzeStandard(anno: number): Scadenza[] {
     {
       titolo: 'Scadenza invio 730 (precompilato o tramite CAF/intermediario)',
       descrizione: 'Termine per la presentazione della dichiarazione 730, salvo proroghe annuali.',
+      azione: 'Invia il 730 direttamente online (se lo fai da solo) oppure consegna CU, spese mediche ed eventuali documenti a un CAF o commercialista entro questa data.',
+      destinatario: 'Un CAF/commercialista di fiducia, oppure invio diretto tramite l\'app dell\'Agenzia delle Entrate se lo fai da solo.',
       dataScadenza: `${anno}-09-30`,
       ricorrenzaAnnuale: true,
       anticipiGiorni: [30, 15, 7],
@@ -34,6 +40,8 @@ export function generaScadenzeStandard(anno: number): Scadenza[] {
     {
       titolo: 'Verifica conguaglio 730 a debito/credito in busta paga',
       descrizione: 'Se dal 730 risulta un debito, il datore di lavoro applica la ritenuta nelle buste paga successive (di norma da luglio); verificare che il conguaglio sia stato applicato correttamente.',
+      azione: 'Controlla il cedolino di luglio (o quello successivo all\'invio del 730): dovrebbe comparire una voce di conguaglio IRPEF. Confrontala con l\'esito del 730 che hai ricevuto.',
+      destinatario: 'Nessuna azione verso terzi: è un controllo che fai tu sul tuo cedolino.',
       dataScadenza: `${anno}-07-31`,
       ricorrenzaAnnuale: true,
       anticipiGiorni: [15],
@@ -42,6 +50,8 @@ export function generaScadenzeStandard(anno: number): Scadenza[] {
     {
       titolo: 'Controllo Cassetto Fiscale',
       descrizione: 'Controllo periodico di comunicazioni, esiti e documenti presenti nel Cassetto Fiscale dell\'Agenzia delle Entrate.',
+      azione: 'Accedi al Cassetto Fiscale e controlla se ci sono comunicazioni, esiti di controlli automatici o documenti nuovi da leggere.',
+      destinatario: 'Cassetto Fiscale dell\'Agenzia delle Entrate (agenziaentrate.gov.it, accesso SPID/CIE).',
       dataScadenza: `${anno}-11-30`,
       ricorrenzaAnnuale: true,
       anticipiGiorni: [7],

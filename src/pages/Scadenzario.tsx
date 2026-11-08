@@ -8,6 +8,8 @@ function scadenzaVuota(): Scadenza {
     id: nuovoId(),
     titolo: '',
     descrizione: '',
+    azione: '',
+    destinatario: '',
     dataScadenza: new Date().toISOString().slice(0, 10),
     ricorrenzaAnnuale: false,
     anticipiGiorni: [7],
@@ -57,15 +59,19 @@ export function Scadenzario() {
   }
 
   const reminder = prossimiReminder(scadenze);
+  const scadenzeAttive = scadenze.filter((s) => !s.completata);
+  const scadenzeCompletate = scadenze.filter((s) => s.completata);
 
   return (
     <div>
       {reminder.length > 0 && (
         <div className="card">
-          <h2>Reminder attivi</h2>
+          <h2>Da fare a breve</h2>
           {reminder.map(({ scadenza, giorniRimanenti }) => (
             <div key={scadenza.id} className="anomalia">
-              <strong>{scadenza.titolo}</strong> — {giorniRimanenti >= 0 ? `scade in ${giorniRimanenti} giorni` : `scaduta da ${-giorniRimanenti} giorni`} ({new Date(scadenza.dataScadenza).toLocaleDateString('it-IT')})
+              <strong>{scadenza.titolo}</strong> — {giorniRimanenti >= 0 ? `scade tra ${giorniRimanenti} giorni` : `scaduta da ${-giorniRimanenti} giorni`} ({new Date(scadenza.dataScadenza).toLocaleDateString('it-IT')})
+              {scadenza.azione && <div style={{ marginTop: 4 }}><strong>Cosa fare:</strong> {scadenza.azione}</div>}
+              {scadenza.destinatario && <div><strong>A chi/dove:</strong> {scadenza.destinatario}</div>}
             </div>
           ))}
         </div>
@@ -79,25 +85,47 @@ export function Scadenzario() {
             <button className="primary" onClick={() => setForm(scadenzaVuota())}>+ Aggiungi</button>
           </div>
         </div>
-        {scadenze.length === 0 && <div className="empty-state">Nessuna scadenza configurata. Genera le scadenze standard per un dipendente senza partita IVA e senza immobili diversi dalla prima casa.</div>}
-        {scadenze.length > 0 && (
-          <table>
-            <thead><tr><th></th><th>Titolo</th><th>Scadenza</th><th>Categoria</th><th></th></tr></thead>
-            <tbody>
-              {scadenze.map((s) => (
-                <tr key={s.id} style={{ opacity: s.completata ? 0.5 : 1 }}>
-                  <td><input type="checkbox" checked={s.completata} onChange={() => toggleCompletata(s)} /></td>
-                  <td>{s.titolo}<div style={{ fontSize: 12, color: 'var(--text-dim)' }}>{s.descrizione}</div></td>
-                  <td>{new Date(s.dataScadenza).toLocaleDateString('it-IT')}</td>
-                  <td>{s.categoria}</td>
-                  <td className="row-actions">
-                    <button className="secondary" onClick={() => setForm(s)}>Modifica</button>
-                    <button className="danger-text" onClick={() => elimina(s.id)}>Elimina</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {scadenze.length === 0 && (
+          <div className="empty-state">
+            Nessuna scadenza configurata. Genera le scadenze standard per un dipendente senza partita IVA
+            e senza immobili diversi dalla prima casa.
+          </div>
+        )}
+
+        {scadenzeAttive.map((s) => (
+          <div key={s.id} className="card" style={{ background: '#0c111c', marginBottom: 10 }}>
+            <div className="toolbar">
+              <div>
+                <input type="checkbox" checked={s.completata} onChange={() => toggleCompletata(s)} style={{ marginRight: 8 }} />
+                <strong>{s.titolo}</strong>
+                <span className="badge" style={{ marginLeft: 8 }}>{new Date(s.dataScadenza).toLocaleDateString('it-IT')}</span>
+              </div>
+              <div className="row-actions">
+                <button className="secondary" onClick={() => setForm(s)}>Modifica</button>
+                <button className="danger-text" onClick={() => elimina(s.id)}>Elimina</button>
+              </div>
+            </div>
+            {s.descrizione && <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: '4px 0' }}>{s.descrizione}</p>}
+            {s.azione && <p style={{ fontSize: 14, margin: '6px 0' }}><strong>Cosa fare:</strong> {s.azione}</p>}
+            {s.destinatario && <p style={{ fontSize: 14, margin: '6px 0' }}><strong>A chi / dove:</strong> {s.destinatario}</p>}
+          </div>
+        ))}
+
+        {scadenzeCompletate.length > 0 && (
+          <details style={{ marginTop: 12 }}>
+            <summary style={{ cursor: 'pointer', color: 'var(--text-dim)', fontSize: 13 }}>
+              {scadenzeCompletate.length} scadenza/e completata/e
+            </summary>
+            {scadenzeCompletate.map((s) => (
+              <div key={s.id} className="toolbar" style={{ opacity: 0.5, marginTop: 8 }}>
+                <div>
+                  <input type="checkbox" checked={s.completata} onChange={() => toggleCompletata(s)} style={{ marginRight: 8 }} />
+                  {s.titolo} — {new Date(s.dataScadenza).toLocaleDateString('it-IT')}
+                </div>
+                <button className="danger-text" onClick={() => elimina(s.id)}>Elimina</button>
+              </div>
+            ))}
+          </details>
         )}
       </div>
 
@@ -132,6 +160,14 @@ export function Scadenzario() {
           <div className="field" style={{ marginTop: 12 }}>
             <label>Descrizione</label>
             <textarea value={form.descrizione} onChange={(e) => aggiorna('descrizione', e.target.value)} rows={2} />
+          </div>
+          <div className="field" style={{ marginTop: 12 }}>
+            <label>Cosa fare (azione concreta)</label>
+            <textarea value={form.azione} onChange={(e) => aggiorna('azione', e.target.value)} rows={2} placeholder="es. Scarica il documento X e caricalo in FiscAI" />
+          </div>
+          <div className="field" style={{ marginTop: 12 }}>
+            <label>A chi / dove va consegnato o eseguito</label>
+            <input value={form.destinatario} onChange={(e) => aggiorna('destinatario', e.target.value)} placeholder="es. CAF di fiducia, Cassetto Fiscale, HR aziendale..." />
           </div>
           <div className="toolbar" style={{ marginTop: 16 }}>
             <button className="secondary" onClick={() => setForm(null)}>Annulla</button>

@@ -97,7 +97,7 @@ export interface Presenza {
 
 export interface DocumentoContrattuale {
   id: string;
-  tipo: 'contratto_individuale' | 'ccnl';
+  tipo: 'contratto_individuale' | 'ccnl' | 'cu' | 'altro';
   nomeFile: string;
   caricatoIl: string;
   testoEstratto: string; // testo grezzo estratto dal PDF, per riferimento/ricerca
@@ -116,6 +116,8 @@ export interface Scadenza {
   id: string;
   titolo: string;
   descrizione: string;
+  azione: string; // cosa fare esattamente, in modo operativo (es. "Scarica la CU dal portale aziendale")
+  destinatario: string; // a chi/dove va consegnato o dove si esegue (es. "CAF di fiducia", "Cassetto Fiscale AdE")
   dataScadenza: string; // ISO date
   ricorrenzaAnnuale: boolean;
   anticipiGiorni: number[]; // es. [30, 15, 7]

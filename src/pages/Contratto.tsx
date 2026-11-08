@@ -3,9 +3,16 @@ import type { DocumentoContrattuale } from '../types';
 import { listaDocumenti, salvaDocumento, eliminaDocumento, nuovoId } from '../db';
 import { estraiTestoPdf } from '../calc/pdfParser';
 
+const ETICHETTE_TIPO: Record<DocumentoContrattuale['tipo'], string> = {
+  contratto_individuale: 'Contratto individuale',
+  ccnl: 'CCNL',
+  cu: 'CU (Certificazione Unica)',
+  altro: 'Altro documento fiscale',
+};
+
 export function Contratto() {
   const [documenti, setDocumenti] = useState<DocumentoContrattuale[]>([]);
-  const [tipoDaCaricare, setTipoDaCaricare] = useState<'contratto_individuale' | 'ccnl'>('contratto_individuale');
+  const [tipoDaCaricare, setTipoDaCaricare] = useState<DocumentoContrattuale['tipo']>('contratto_individuale');
   const [aperto, setAperto] = useState<string | null>(null);
   const [ricerca, setRicerca] = useState('');
   const inputFileRef = useRef<HTMLInputElement>(null);
@@ -60,9 +67,11 @@ export function Contratto() {
         <div className="form-grid">
           <div className="field">
             <label>Tipo documento</label>
-            <select value={tipoDaCaricare} onChange={(e) => setTipoDaCaricare(e.target.value as 'contratto_individuale' | 'ccnl')}>
+            <select value={tipoDaCaricare} onChange={(e) => setTipoDaCaricare(e.target.value as DocumentoContrattuale['tipo'])}>
               <option value="contratto_individuale">Contratto individuale</option>
               <option value="ccnl">Testo CCNL</option>
+              <option value="cu">CU (Certificazione Unica)</option>
+              <option value="altro">Altro documento fiscale</option>
             </select>
           </div>
         </div>
@@ -79,7 +88,7 @@ export function Contratto() {
             {documenti.map((d) => (
               <tr key={d.id}>
                 <td>{d.nomeFile}</td>
-                <td>{d.tipo === 'ccnl' ? 'CCNL' : 'Contratto individuale'}</td>
+                <td>{ETICHETTE_TIPO[d.tipo]}</td>
                 <td>{new Date(d.caricatoIl).toLocaleDateString('it-IT')}</td>
                 <td className="row-actions">
                   <button className="secondary" onClick={() => setAperto(d.id)}>Apri testo</button>
