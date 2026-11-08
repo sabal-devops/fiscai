@@ -18,6 +18,7 @@ const PROFILO_VUOTO: ProfiloType = {
   mutuo: { attivo: false, interessiAnnui: 0, tipo: 'prima_casa' },
   addizionaleRegionalePct: 0,
   addizionaleComunalePct: 0,
+  tariffaOrariaReperibilita: 0,
   aggiornatoIl: '',
 };
 
@@ -101,6 +102,21 @@ export function Profilo() {
           <div className="field">
             <label>Aliquota addizionale comunale (%)</label>
             <input type="number" step="0.01" value={profilo.addizionaleComunalePct} onChange={(e) => aggiorna('addizionaleComunalePct', parseFloat(e.target.value) || 0)} />
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Reperibilità</h2>
+        <p style={{ color: 'var(--text-dim)', fontSize: 13, marginTop: -4 }}>
+          Facoltativa: l'indennità di reperibilità non è fissata in modo uniforme dal CCNL, dipende spesso
+          da accordo aziendale. Inseriscila quando la conosci (es. dal contratto o da HR) per far verificare
+          a FiscAI, nel Modulo 3, se le ore di reperibilità del mese sono state pagate correttamente.
+        </p>
+        <div className="form-grid">
+          <div className="field">
+            <label>Tariffa oraria di reperibilità (€)</label>
+            <input type="number" step="0.01" value={profilo.tariffaOrariaReperibilita} onChange={(e) => aggiorna('tariffaOrariaReperibilita', parseFloat(e.target.value) || 0)} />
           </div>
         </div>
       </div>

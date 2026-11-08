@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Presenza, Profilo, Cedolino } from '../types';
 import { getProfilo, listaPresenze, salvaPresenza, eliminaPresenza, trovaPresenzaPerPeriodo, listaCedolini, nuovoId } from '../db';
-import { calcolaRetribuzioneAttesa, confrontaPresenzeConCedolino } from '../calc/presenze';
+import { calcolaRetribuzioneAttesa, confrontaPresenzeConCedolino, confrontaReperibilita } from '../calc/presenze';
 
 const MESI = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
 
@@ -18,7 +18,7 @@ function presenzaVuota(): Presenza {
     oreStraordinarioFeriale: 0,
     oreStraordinarioFestivo: 0,
     oreStraordinarioNotturno: 0,
-    giorniReperibilita: 0,
+    oreReperibilita: 0,
     note: '',
   };
 }
@@ -83,6 +83,9 @@ export function Presenze() {
             const confronto = cedolinoMese
               ? confrontaPresenzeConCedolino(attesa, cedolinoMese.retribuzioneBase, cedolinoMese.straordinari)
               : undefined;
+            const confrontoReperibilita = cedolinoMese && p.oreReperibilita > 0
+              ? confrontaReperibilita(attesa, cedolinoMese.indennita)
+              : undefined;
             return (
               <div key={p.id} className="card" style={{ background: '#0c111c' }}>
                 <div className="toolbar">
@@ -101,10 +104,27 @@ export function Presenze() {
                     <div className="label">Cedolino dello stesso mese</div>
                     <div className="value">{cedolinoMese ? `€${(cedolinoMese.retribuzioneBase + cedolinoMese.straordinari).toFixed(2)}` : 'non caricato'}</div>
                   </div>
+                  {p.oreReperibilita > 0 && (
+                    <div className="stat-box">
+                      <div className="label">Indennità reperibilità attesa ({p.oreReperibilita} ore)</div>
+                      <div className="value">
+                        {attesa.tariffaReperibilitaDisponibile ? `€${attesa.indennitaReperibilitaAttesa.toFixed(2)}` : 'tariffa non impostata'}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="formula">{attesa.formula}</div>
                 {confronto && !confronto.entroTolleranza && <div className="anomalia">{confronto.messaggio}</div>}
                 {confronto && confronto.entroTolleranza && <div className="badge ok" style={{ marginTop: 8 }}>Coerente col cedolino</div>}
+                {p.oreReperibilita > 0 && !attesa.tariffaReperibilitaDisponibile && (
+                  <div className="anomalia">Imposta la tariffa oraria di reperibilità nel Modulo 1 per verificare se è stata pagata correttamente.</div>
+                )}
+                {confrontoReperibilita && confrontoReperibilita.stato === 'da_verificare' && (
+                  <div className="anomalia">{confrontoReperibilita.messaggio}</div>
+                )}
+                {confrontoReperibilita && confrontoReperibilita.stato === 'ok' && (
+                  <div className="badge ok" style={{ marginTop: 8 }}>Reperibilità coerente col cedolino</div>
+                )}
               </div>
             );
           })}
@@ -154,8 +174,8 @@ export function Presenze() {
               <input type="number" value={form.oreStraordinarioNotturno} onChange={(e) => aggiorna('oreStraordinarioNotturno', parseFloat(e.target.value) || 0)} />
             </div>
             <div className="field">
-              <label>Giornate di reperibilità</label>
-              <input type="number" value={form.giorniReperibilita} onChange={(e) => aggiorna('giorniReperibilita', parseFloat(e.target.value) || 0)} />
+              <label>Ore di reperibilità</label>
+              <input type="number" value={form.oreReperibilita} onChange={(e) => aggiorna('oreReperibilita', parseFloat(e.target.value) || 0)} />
             </div>
           </div>
           <div className="field" style={{ marginTop: 12 }}>

@@ -44,6 +44,11 @@ export interface Profilo {
   addizionaleRegionalePct: number;
   addizionaleComunalePct: number;
 
+  // Indennità oraria di reperibilità (facoltativa): non è fissata in modo uniforme dal CCNL,
+  // dipende spesso da accordo aziendale. Se non la conosci, lascia a 0: il confronto col cedolino
+  // verrà saltato invece di stimare un importo inventato.
+  tariffaOrariaReperibilita: number;
+
   aggiornatoIl: string;
 }
 
@@ -92,7 +97,7 @@ export interface Presenza {
   oreStraordinarioFeriale: number;
   oreStraordinarioFestivo: number;
   oreStraordinarioNotturno: number;
-  giorniReperibilita: number;
+  oreReperibilita: number;
   note: string;
 }
 
