@@ -18,7 +18,8 @@ function presenzaVuota(): Presenza {
     oreStraordinarioFeriale: 0,
     oreStraordinarioFestivo: 0,
     oreStraordinarioNotturno: 0,
-    oreReperibilita: 0,
+    reperibilitaImportoComunicato: 0,
+    reperibilitaRiferimento: '',
     note: '',
   };
 }
@@ -76,6 +77,12 @@ export function Presenze() {
             <h2 style={{ margin: 0 }}>Presenze mensili</h2>
             <button className="primary" onClick={() => setForm(presenzaVuota())}>+ Nuovo mese</button>
           </div>
+          <p className="card-sottotitolo">
+            La reperibilità <strong>attiva</strong> (ore effettivamente lavorate quando vieni richiamato) va
+            registrata come straordinario qui sopra. La reperibilità <strong>passiva</strong> (il compenso per
+            la sola disponibilità) ha un campo a parte più sotto: inserisci l'importo che ti comunica l'azienda
+            via email, non va stimato.
+          </p>
           {presenze.length === 0 && <div className="empty-state">Nessuna presenza inserita.</div>}
           {presenze.map((p) => {
             const cedolinoMese = cedolini.find((c) => c.mese === p.mese && c.anno === p.anno);
@@ -83,8 +90,8 @@ export function Presenze() {
             const confronto = cedolinoMese
               ? confrontaPresenzeConCedolino(attesa, cedolinoMese.retribuzioneBase, cedolinoMese.straordinari)
               : undefined;
-            const confrontoReperibilita = cedolinoMese && p.oreReperibilita > 0
-              ? confrontaReperibilita(attesa, cedolinoMese.indennita)
+            const confrontoRep = cedolinoMese && p.reperibilitaImportoComunicato > 0
+              ? confrontaReperibilita(p.reperibilitaImportoComunicato, cedolinoMese.indennita)
               : undefined;
             return (
               <div key={p.id} className="card" style={{ background: '#0c111c' }}>
@@ -104,27 +111,18 @@ export function Presenze() {
                     <div className="label">Cedolino dello stesso mese</div>
                     <div className="value">{cedolinoMese ? `€${(cedolinoMese.retribuzioneBase + cedolinoMese.straordinari).toFixed(2)}` : 'non caricato'}</div>
                   </div>
-                  {p.oreReperibilita > 0 && (
+                  {p.reperibilitaImportoComunicato > 0 && (
                     <div className="stat-box">
-                      <div className="label">Indennità reperibilità attesa ({p.oreReperibilita} ore)</div>
-                      <div className="value">
-                        {attesa.tariffaReperibilitaDisponibile ? `€${attesa.indennitaReperibilitaAttesa.toFixed(2)}` : 'tariffa non impostata'}
-                      </div>
+                      <div className="label">Reperibilità comunicata{p.reperibilitaRiferimento ? ` (${p.reperibilitaRiferimento})` : ''}</div>
+                      <div className="value">€{p.reperibilitaImportoComunicato.toFixed(2)}</div>
                     </div>
                   )}
                 </div>
                 <div className="formula">{attesa.formula}</div>
                 {confronto && !confronto.entroTolleranza && <div className="anomalia">{confronto.messaggio}</div>}
                 {confronto && confronto.entroTolleranza && <div className="badge ok" style={{ marginTop: 8 }}>Coerente col cedolino</div>}
-                {p.oreReperibilita > 0 && !attesa.tariffaReperibilitaDisponibile && (
-                  <div className="anomalia">Imposta la tariffa oraria di reperibilità nel Profilo per verificare se è stata pagata correttamente.</div>
-                )}
-                {confrontoReperibilita && confrontoReperibilita.stato === 'da_verificare' && (
-                  <div className="anomalia">{confrontoReperibilita.messaggio}</div>
-                )}
-                {confrontoReperibilita && confrontoReperibilita.stato === 'ok' && (
-                  <div className="badge ok" style={{ marginTop: 8 }}>Reperibilità coerente col cedolino</div>
-                )}
+                {confrontoRep && confrontoRep.stato === 'da_verificare' && <div className="anomalia">{confrontoRep.messaggio}</div>}
+                {confrontoRep && confrontoRep.stato === 'ok' && <div className="badge ok" style={{ marginTop: 8 }}>Reperibilità coerente col cedolino</div>}
               </div>
             );
           })}
@@ -173,9 +171,20 @@ export function Presenze() {
               <label>Ore straordinario notturno (+35%)</label>
               <input type="number" value={form.oreStraordinarioNotturno} onChange={(e) => aggiorna('oreStraordinarioNotturno', parseFloat(e.target.value) || 0)} />
             </div>
+          </div>
+          <h2 style={{ marginTop: 20, fontSize: 15 }}>Reperibilità passiva</h2>
+          <p className="card-sottotitolo">
+            Inserisci l'importo esatto che l'azienda ti ha comunicato via email per questo mese di competenza
+            (non stimarlo). Spesso viene pagato nel cedolino del mese successivo: lo verifichiamo quando arriva.
+          </p>
+          <div className="form-grid">
             <div className="field">
-              <label>Ore di reperibilità</label>
-              <input type="number" value={form.oreReperibilita} onChange={(e) => aggiorna('oreReperibilita', parseFloat(e.target.value) || 0)} />
+              <label>Importo comunicato (€)</label>
+              <input type="number" value={form.reperibilitaImportoComunicato} onChange={(e) => aggiorna('reperibilitaImportoComunicato', parseFloat(e.target.value) || 0)} />
+            </div>
+            <div className="field">
+              <label>Riferimento (facoltativo, es. progetto/WBS)</label>
+              <input value={form.reperibilitaRiferimento} onChange={(e) => aggiorna('reperibilitaRiferimento', e.target.value)} />
             </div>
           </div>
           <div className="field" style={{ marginTop: 12 }}>

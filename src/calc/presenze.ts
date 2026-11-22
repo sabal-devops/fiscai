@@ -3,6 +3,8 @@ import type { Presenza, Profilo } from '../types';
 // Calcolo della retribuzione attesa dalle presenze dichiarate, da confrontare col cedolino.
 // Valore ora = (RAL / mensilità) / 173 (divisore convenzionale mensile CCNL Metalmeccanici per il calcolo orario).
 // Maggiorazioni straordinario (indicative, da CCNL Metalmeccanici Industria): feriale +25%, festivo +50%, notturno +35%.
+// Le ore di reperibilità "attiva" (quando vieni richiamato) rientrano in queste maggiorazioni se lavorate
+// davvero: non serve un calcolo a parte, basta registrarle come straordinario nel mese giusto.
 
 export const DIVISORE_ORARIO_MENSILE = 173;
 export const MAGGIORAZIONE_STRAORDINARIO_FERIALE = 0.25;
@@ -16,9 +18,6 @@ export interface RisultatoRetribuzioneAttesa {
   dettaglioStraordinario: { tipo: string; ore: number; maggiorazione: number; importo: number }[];
   totaleAtteso: number;
   formula: string;
-  indennitaReperibilitaAttesa: number;
-  tariffaReperibilitaDisponibile: boolean;
-  formulaReperibilita: string;
 }
 
 export function calcolaRetribuzioneAttesa(profilo: Profilo, presenza: Presenza): RisultatoRetribuzioneAttesa {
@@ -50,11 +49,6 @@ export function calcolaRetribuzioneAttesa(profilo: Profilo, presenza: Presenza):
 
   const competenzaStraordinario = dettaglioStraordinario.reduce((acc, d) => acc + d.importo, 0);
 
-  const tariffaReperibilitaDisponibile = profilo.tariffaOrariaReperibilita > 0;
-  const indennitaReperibilitaAttesa = tariffaReperibilitaDisponibile
-    ? profilo.tariffaOrariaReperibilita * presenza.oreReperibilita
-    : 0;
-
   return {
     valoreOraBase,
     competenzaOrdinaria,
@@ -62,11 +56,6 @@ export function calcolaRetribuzioneAttesa(profilo: Profilo, presenza: Presenza):
     dettaglioStraordinario,
     totaleAtteso: competenzaOrdinaria + competenzaStraordinario,
     formula: `valore ora = (RAL / mensilità) / ${DIVISORE_ORARIO_MENSILE}; ordinario = valore ora x ore ordinarie; straordinario = valore ora x (1 + maggiorazione) x ore per tipo`,
-    indennitaReperibilitaAttesa,
-    tariffaReperibilitaDisponibile,
-    formulaReperibilita: tariffaReperibilitaDisponibile
-      ? `ore di reperibilità (${presenza.oreReperibilita}) x tariffa oraria impostata nel Profilo (€${profilo.tariffaOrariaReperibilita.toFixed(2)})`
-      : 'tariffa oraria di reperibilità non impostata nel Profilo: impossibile stimare l\'importo atteso, non viene inventato un valore.',
   };
 }
 
@@ -104,37 +93,37 @@ export function confrontaPresenzeConCedolino(
 }
 
 export interface ConfrontoReperibilita {
-  stato: 'ok' | 'da_verificare' | 'non_disponibile';
-  attesa: number;
+  stato: 'ok' | 'da_verificare' | 'non_comunicato';
+  comunicato: number;
   cedolino: number;
   messaggio: string;
 }
 
-const TOLLERANZA_REPERIBILITA_EURO = 3.0;
+const TOLLERANZA_REPERIBILITA_EURO = 2.0;
 
-// Confronta l'indennità di reperibilità attesa (ore x tariffa oraria) con una voce del cedolino.
-// Passare come "indennitaCedolino" la voce del cedolino dove compare l'indennità di reperibilità
-// (spesso nel campo generico "indennità": verificare come la indica il tuo cedolino).
+// Confronta l'importo di reperibilità che l'azienda ha comunicato via email (Presenza.reperibilitaImportoComunicato,
+// l'unica fonte attendibile: non si stima con una formula) con la voce corrispondente nel cedolino del mese
+// in cui viene effettivamente pagato (spesso il mese successivo a quello di competenza).
 export function confrontaReperibilita(
-  attesa: RisultatoRetribuzioneAttesa,
+  importoComunicato: number,
   indennitaCedolino: number,
 ): ConfrontoReperibilita {
-  if (!attesa.tariffaReperibilitaDisponibile) {
+  if (importoComunicato <= 0) {
     return {
-      stato: 'non_disponibile',
-      attesa: 0,
+      stato: 'non_comunicato',
+      comunicato: 0,
       cedolino: indennitaCedolino,
-      messaggio: 'Imposta la tariffa oraria di reperibilità nel Profilo per attivare questo confronto.',
+      messaggio: 'Nessun importo di reperibilità comunicato per questo mese.',
     };
   }
-  const differenza = indennitaCedolino - attesa.indennitaReperibilitaAttesa;
+  const differenza = indennitaCedolino - importoComunicato;
   const entroTolleranza = Math.abs(differenza) <= TOLLERANZA_REPERIBILITA_EURO;
   return {
     stato: entroTolleranza ? 'ok' : 'da_verificare',
-    attesa: attesa.indennitaReperibilitaAttesa,
+    comunicato: importoComunicato,
     cedolino: indennitaCedolino,
     messaggio: entroTolleranza
-      ? 'Indennità di reperibilità coerente con le ore dichiarate.'
-      : `Indennità attesa per la reperibilità: €${attesa.indennitaReperibilitaAttesa.toFixed(2)} (${attesa.formulaReperibilita}). Nel cedolino risulta €${indennitaCedolino.toFixed(2)}: verifica a quale voce corrisponde, potrebbe essere indicata con un codice diverso dal campo "indennità" generico.`,
+      ? 'Indennità di reperibilità coerente con quanto comunicato dall\'azienda.'
+      : `L'azienda aveva comunicato €${importoComunicato.toFixed(2)} di reperibilità, nel cedolino di questo mese risulta €${indennitaCedolino.toFixed(2)}. Attenzione: la reperibilità viene spesso pagata nel mese successivo a quello di competenza, quindi confronta col cedolino giusto prima di considerarlo un errore.`,
   };
 }
