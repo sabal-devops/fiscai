@@ -44,7 +44,9 @@ export function Export() {
     const cedoliniAnno = cedolini.filter((c) => c.anno === anno).sort((a, b) => a.mese - b.mese);
     const speseAnno = spese.filter((s) => new Date(s.data).getFullYear() === anno);
     const totaleSpese = speseAnno.reduce((a, s) => a + s.importo, 0);
-    const detrazione = calcolaDetrazioneSpeseMediche(totaleSpese);
+    const totaleRimborsato = speseAnno.reduce((a, s) => a + (s.rimborsatoDaFondoSanitario || 0), 0);
+    const nettoSpese = Math.max(0, totaleSpese - totaleRimborsato);
+    const detrazione = calcolaDetrazioneSpeseMediche(nettoSpese);
 
     const doc = new jsPDF();
     let y = 15;
@@ -88,7 +90,7 @@ export function Export() {
     doc.text('Spese mediche e detrazione 730', 14, y);
     y += 6;
     doc.setFontSize(9);
-    doc.text(`Totale spese sostenute: €${totaleSpese.toFixed(2)}`, 14, y);
+    doc.text(`Totale spese sostenute: €${totaleSpese.toFixed(2)} (rimborsato da fondo sanitario: €${totaleRimborsato.toFixed(2)}, netto detraibile: €${nettoSpese.toFixed(2)})`, 14, y);
     y += 5;
     doc.text(`Franchigia non detraibile: €${detrazione.franchigia.toFixed(2)}`, 14, y);
     y += 5;

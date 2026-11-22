@@ -34,8 +34,12 @@ export function Dashboard() {
 
   const proiezioneIrpefAnnua = cedoliniAnno.length > 0 && profilo ? (irpefVersata / cedoliniAnno.length) * profilo.mensilita : 0;
 
-  const totaleSpeseMedicheAnno = spese.filter((s) => new Date(s.data).getFullYear() === annoCorrente).reduce((a, s) => a + s.importo, 0);
-  const detrazioneMediche = calcolaDetrazioneSpeseMediche(totaleSpeseMedicheAnno);
+  const speseMedicheAnno = spese.filter((s) => new Date(s.data).getFullYear() === annoCorrente);
+  const nettoSpeseMedicheAnno = Math.max(
+    0,
+    speseMedicheAnno.reduce((a, s) => a + s.importo, 0) - speseMedicheAnno.reduce((a, s) => a + (s.rimborsatoDaFondoSanitario || 0), 0),
+  );
+  const detrazioneMediche = calcolaDetrazioneSpeseMediche(nettoSpeseMedicheAnno);
 
   const reminder = prossimiReminder(scadenze);
 

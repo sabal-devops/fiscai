@@ -116,6 +116,8 @@ export interface SpesaMedica {
   importo: number;
   descrizione: string;
   categoria: string;
+  rimborsatoDaFondoSanitario: number; // importo già rimborsato da un fondo sanitario integrativo (es. welfare aziendale):
+  // la parte rimborsata NON è detraibile nel 730, solo l'eventuale residuo pagato di tasca propria.
 }
 
 export interface Scadenza {
