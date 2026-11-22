@@ -12,6 +12,7 @@ Commercialista digitale personale, locale e offline, per dipendenti privati senz
 - **Modulo 6 — Scadenzario fiscale**: scadenze standard per un dipendente senza P.IVA (CU, 730, Cassetto Fiscale), con reminder configurabili e checklist.
 - **Modulo 7 — Dashboard annuale**: lordo cumulato vs atteso, netto mensile, IRPEF versata e proiettata, TFR cumulato, detrazioni recuperabili, alert attivi.
 - **Modulo 8 — Export**: report PDF annuale per il CAF, export CSV dei cedolini, backup/restore completo in JSON.
+- **Assistente IA (opzionale)**: domande in linguaggio naturale rispondendo tramite [Ollama](https://ollama.com) in esecuzione sul PC dell'utente — nessun dato lascia il dispositivo, vedi sotto.
 
 ## Principi
 
@@ -24,10 +25,14 @@ Commercialista digitale personale, locale e offline, per dipendenti privati senz
 Il codice di questo repository è pubblico, ma **i tuoi dati non lo sono**: cedolini, contratti, importi,
 dati anagrafici non vengono mai trasmessi a nessun server né salvati nel repository. L'app:
 
-- non contiene alcuna chiamata di rete verso API esterne (nessun `fetch`, nessun backend);
+- non contiene alcuna chiamata di rete verso servizi cloud o API esterne;
 - estrae il testo dai PDF caricati interamente nel browser (libreria `pdfjs-dist`, eseguita in locale);
 - salva ogni dato inserito solo in IndexedDB, un database del browser legato al dispositivo su cui lo usi;
 - non invia telemetria, analytics o log a servizi terzi.
+
+**Unica eccezione, disattivata di default**: l'Assistente IA (opzionale) fa una chiamata `fetch` verso
+`http://localhost:11434` (Ollama), mai verso un indirizzo esterno. Se non lo attivi, questa chiamata non
+avviene mai. Anche attivo, resta un dialogo tra il tuo browser e un programma installato sullo stesso PC.
 
 Quando usi la versione pubblicata su GitHub Pages, il sito serve solo i file statici dell'applicazione
 (HTML/CSS/JS): i dati che inserisci restano nel tuo browser, esattamente come se l'app girasse in locale.

@@ -136,4 +136,9 @@ export interface Scadenza {
 export interface ImpostazioniApp {
   id: 'singleton';
   annoFiscaleCorrente: number;
+  // Assistente IA locale (opzionale, via Ollama in esecuzione sul PC dell'utente).
+  // Nessuna chiamata lascia il dispositivo: va solo verso http://localhost, mai verso un servizio esterno.
+  assistenteAbilitato: boolean;
+  assistenteEndpoint: string; // es. http://localhost:11434
+  assistenteModello: string; // es. llama3.2
 }

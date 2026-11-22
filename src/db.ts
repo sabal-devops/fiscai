@@ -194,13 +194,20 @@ export async function eliminaScadenza(id: string): Promise<void> {
 }
 
 // --- Impostazioni ---
+const IMPOSTAZIONI_DEFAULT: ImpostazioniApp = {
+  id: 'singleton',
+  annoFiscaleCorrente: new Date().getFullYear(),
+  assistenteAbilitato: false,
+  assistenteEndpoint: 'http://localhost:11434',
+  assistenteModello: 'llama3.2',
+};
+
 export async function getImpostazioni(): Promise<ImpostazioniApp> {
   const db = await getDb();
   const imp = await db.get('impostazioni', 'singleton');
-  if (imp) return imp;
-  const defaults: ImpostazioniApp = { id: 'singleton', annoFiscaleCorrente: new Date().getFullYear() };
-  await db.put('impostazioni', defaults, 'singleton');
-  return defaults;
+  if (imp) return { ...IMPOSTAZIONI_DEFAULT, ...imp };
+  await db.put('impostazioni', IMPOSTAZIONI_DEFAULT, 'singleton');
+  return IMPOSTAZIONI_DEFAULT;
 }
 
 export async function salvaImpostazioni(imp: ImpostazioniApp): Promise<void> {

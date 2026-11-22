@@ -7,11 +7,12 @@ import { Contratto } from './pages/Contratto';
 import { SpeseMediche } from './pages/SpeseMediche';
 import { Checklist730 } from './pages/Checklist730';
 import { Routine } from './pages/Routine';
+import { Assistente } from './pages/Assistente';
 import { Scadenzario } from './pages/Scadenzario';
 import { Dashboard } from './pages/Dashboard';
 import { Export } from './pages/Export';
 
-type Pagina = 'dashboard' | 'routine' | 'profilo' | 'cedolini' | 'presenze' | 'contratto' | 'spese' | 'checklist' | 'scadenzario' | 'export';
+type Pagina = 'dashboard' | 'routine' | 'profilo' | 'cedolini' | 'presenze' | 'contratto' | 'spese' | 'checklist' | 'scadenzario' | 'assistente' | 'export';
 
 const VOCI_MENU: { id: Pagina; label: string }[] = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -23,6 +24,7 @@ const VOCI_MENU: { id: Pagina; label: string }[] = [
   { id: 'spese', label: '5. Spese mediche' },
   { id: 'checklist', label: 'Documenti per il 730' },
   { id: 'scadenzario', label: '6. Scadenzario' },
+  { id: 'assistente', label: 'Assistente IA' },
   { id: 'export', label: '8. Export' },
 ];
 
@@ -51,6 +53,7 @@ function App() {
         {pagina === 'spese' && <SpeseMediche />}
         {pagina === 'checklist' && <Checklist730 />}
         {pagina === 'scadenzario' && <Scadenzario />}
+        {pagina === 'assistente' && <Assistente />}
         {pagina === 'export' && <Export />}
       </main>
     </div>
