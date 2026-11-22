@@ -17,7 +17,7 @@ export function analizzaCedolino(
   const anomalie: string[] = [];
 
   if (!profilo) {
-    anomalie.push('Profilo contribuente non ancora compilato: impossibile eseguire le verifiche su livello CCNL, RAL e detrazioni. Completa il Modulo 1.');
+    anomalie.push('Profilo contribuente non ancora compilato: impossibile eseguire le verifiche su livello CCNL, RAL e detrazioni. Completa il Profilo.');
     return anomalie;
   }
 

@@ -10,7 +10,7 @@ export function generaScadenzeStandard(anno: number): Scadenza[] {
     {
       titolo: 'Consultazione Certificazione Unica (CU)',
       descrizione: 'Il datore di lavoro deve rilasciare la CU con i redditi dell\'anno precedente, necessaria per il 730.',
-      azione: 'Scarica la CU dal portale HR aziendale (o chiedila all\'ufficio del personale) e caricala nel Modulo 4 di FiscAI per averla sempre a disposizione.',
+      azione: 'Scarica la CU dal portale HR aziendale (o chiedila all\'ufficio del personale) e caricala nel Contratto di FiscAI per averla sempre a disposizione.',
       destinatario: 'La ricevi dal tuo datore di lavoro (Accenture, portale HR); non va consegnata a nessuno a questo punto.',
       dataScadenza: `${anno}-03-16`,
       ricorrenzaAnnuale: true,

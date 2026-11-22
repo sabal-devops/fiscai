@@ -65,7 +65,7 @@ export function Presenze() {
   }
 
   if (!profilo) {
-    return <div className="card"><div className="empty-state">Completa prima il Modulo 1 - Profilo contribuente (serve la RAL per calcolare la retribuzione attesa).</div></div>;
+    return <div className="card"><div className="empty-state">Completa prima il Profilo contribuente (serve la RAL per calcolare la retribuzione attesa).</div></div>;
   }
 
   return (
@@ -117,7 +117,7 @@ export function Presenze() {
                 {confronto && !confronto.entroTolleranza && <div className="anomalia">{confronto.messaggio}</div>}
                 {confronto && confronto.entroTolleranza && <div className="badge ok" style={{ marginTop: 8 }}>Coerente col cedolino</div>}
                 {p.oreReperibilita > 0 && !attesa.tariffaReperibilitaDisponibile && (
-                  <div className="anomalia">Imposta la tariffa oraria di reperibilità nel Modulo 1 per verificare se è stata pagata correttamente.</div>
+                  <div className="anomalia">Imposta la tariffa oraria di reperibilità nel Profilo per verificare se è stata pagata correttamente.</div>
                 )}
                 {confrontoReperibilita && confrontoReperibilita.stato === 'da_verificare' && (
                   <div className="anomalia">{confrontoReperibilita.messaggio}</div>

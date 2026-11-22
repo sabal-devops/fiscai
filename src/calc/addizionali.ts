@@ -55,7 +55,7 @@ export function verificaAddizionali(risultato: RisultatoAddizionali): VerificaAd
   if (!risultato.disponibile) {
     return {
       esito: 'non_disponibile',
-      messaggio: 'Aliquote addizionali regionale/comunale non impostate nel profilo (Modulo 1): verifica saltata. Se le conosci, inseriscile per attivare questo controllo indicativo.',
+      messaggio: 'Aliquote addizionali regionale/comunale non impostate nel profilo (Profilo): verifica saltata. Se le conosci, inseriscile per attivare questo controllo indicativo.',
     };
   }
   if (risultato.trattenutaCedolino === 0 && risultato.stimaMensileIndicativa > 1) {

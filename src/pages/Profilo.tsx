@@ -111,7 +111,7 @@ export function Profilo() {
         <p style={{ color: 'var(--text-dim)', fontSize: 13, marginTop: -4 }}>
           Facoltativa: l'indennità di reperibilità non è fissata in modo uniforme dal CCNL, dipende spesso
           da accordo aziendale. Inseriscila quando la conosci (es. dal contratto o da HR) per far verificare
-          a FiscAI, nel Modulo 3, se le ore di reperibilità del mese sono state pagate correttamente.
+          a FiscAI, in Presenze, se le ore di reperibilità del mese sono state pagate correttamente.
         </p>
         <div className="form-grid">
           <div className="field">

@@ -63,7 +63,7 @@ export function verificaRetribuzioneBase(
       livelloTrovato: false,
       formula: 'n/d',
       esito: 'livello_non_in_tabella',
-      messaggio: `Livello "${livello}" non presente nella tabella CCNL caricata in FiscAI. Verifica manualmente con il contratto o CCNL ufficiale (Modulo 4) prima di considerare questo controllo attendibile.`,
+      messaggio: `Livello "${livello}" non presente nella tabella CCNL caricata in FiscAI. Verifica manualmente con il contratto o CCNL ufficiale (Contratto) prima di considerare questo controllo attendibile.`,
     };
   }
   const formula = `retribuzione base cedolino (€${retribuzioneBaseCedolino.toFixed(2)}) >= minimo tabellare livello ${riferimento.livello} (€${riferimento.minimoMensile.toFixed(2)})`;

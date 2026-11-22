@@ -65,8 +65,8 @@ export function calcolaRetribuzioneAttesa(profilo: Profilo, presenza: Presenza):
     indennitaReperibilitaAttesa,
     tariffaReperibilitaDisponibile,
     formulaReperibilita: tariffaReperibilitaDisponibile
-      ? `ore di reperibilità (${presenza.oreReperibilita}) x tariffa oraria impostata nel Modulo 1 (€${profilo.tariffaOrariaReperibilita.toFixed(2)})`
-      : 'tariffa oraria di reperibilità non impostata nel Modulo 1: impossibile stimare l\'importo atteso, non viene inventato un valore.',
+      ? `ore di reperibilità (${presenza.oreReperibilita}) x tariffa oraria impostata nel Profilo (€${profilo.tariffaOrariaReperibilita.toFixed(2)})`
+      : 'tariffa oraria di reperibilità non impostata nel Profilo: impossibile stimare l\'importo atteso, non viene inventato un valore.',
   };
 }
 
@@ -124,7 +124,7 @@ export function confrontaReperibilita(
       stato: 'non_disponibile',
       attesa: 0,
       cedolino: indennitaCedolino,
-      messaggio: 'Imposta la tariffa oraria di reperibilità nel Modulo 1 per attivare questo confronto.',
+      messaggio: 'Imposta la tariffa oraria di reperibilità nel Profilo per attivare questo confronto.',
     };
   }
   const differenza = indennitaCedolino - attesa.indennitaReperibilitaAttesa;

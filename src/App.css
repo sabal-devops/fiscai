@@ -18,6 +18,7 @@ html, body, #root { margin: 0; padding: 0; background: var(--bg); color: var(--t
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   font-size: 15px;
+  line-height: 1.5;
 }
 
 .app-shell {
@@ -38,35 +39,59 @@ body {
 }
 
 .sidebar h1 {
-  font-size: 18px;
-  padding: 0 16px 16px;
+  font-size: 19px;
+  font-weight: 700;
+  padding: 4px 20px 18px;
   margin: 0;
   border-bottom: 1px solid var(--border);
+  letter-spacing: 0.2px;
+}
+
+.sidebar nav { padding: 8px 10px; }
+
+.nav-sezione { margin-bottom: 14px; }
+
+.nav-sezione-titolo {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+  padding: 8px 10px 6px;
+  opacity: 0.75;
 }
 
 .sidebar nav button {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
   text-align: left;
   background: none;
   border: none;
+  border-radius: 8px;
   color: var(--text-dim);
-  padding: 10px 16px;
+  padding: 9px 10px;
   cursor: pointer;
   font-size: 14px;
+  margin-bottom: 2px;
+  transition: background 0.12s, color 0.12s;
 }
+
+.sidebar nav button svg { flex-shrink: 0; opacity: 0.85; }
 
 .sidebar nav button.active {
   color: var(--text);
-  background: rgba(91, 140, 255, 0.12);
-  border-right: 2px solid var(--accent);
+  background: rgba(91, 140, 255, 0.16);
+  font-weight: 600;
 }
+.sidebar nav button.active svg { opacity: 1; color: var(--accent); }
 
-.sidebar nav button:hover { color: var(--text); }
+.sidebar nav button:hover:not(.active) { color: var(--text); background: rgba(255, 255, 255, 0.04); }
 
 .main-content {
   flex: 1;
-  padding: 24px 32px;
+  padding: 28px 36px;
   max-width: 1100px;
 }
 
@@ -74,11 +99,18 @@ body {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 20px;
-  margin-bottom: 16px;
+  padding: 18px 22px;
+  margin-bottom: 18px;
 }
 
-.card h2 { margin-top: 0; font-size: 17px; }
+.card h2 { margin-top: 0; margin-bottom: 10px; font-size: 17px; font-weight: 600; }
+
+.card-sottotitolo {
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: -4px 0 14px;
+}
 
 .form-grid {
   display: grid;

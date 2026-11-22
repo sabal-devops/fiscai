@@ -11,21 +11,53 @@ import { Assistente } from './pages/Assistente';
 import { Scadenzario } from './pages/Scadenzario';
 import { Dashboard } from './pages/Dashboard';
 import { Export } from './pages/Export';
+import {
+  IconHome, IconChecklist, IconUser, IconDocument, IconClock, IconBriefcase,
+  IconHeart, IconShield, IconCalendar, IconMessage, IconDownload,
+} from './icons';
 
 type Pagina = 'dashboard' | 'routine' | 'profilo' | 'cedolini' | 'presenze' | 'contratto' | 'spese' | 'checklist' | 'scadenzario' | 'assistente' | 'export';
 
-const VOCI_MENU: { id: Pagina; label: string }[] = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'routine', label: 'La tua routine' },
-  { id: 'profilo', label: '1. Profilo' },
-  { id: 'cedolini', label: '2. Cedolini' },
-  { id: 'presenze', label: '3. Presenze' },
-  { id: 'contratto', label: '4. Contratto' },
-  { id: 'spese', label: '5. Spese mediche' },
-  { id: 'checklist', label: 'Documenti per il 730' },
-  { id: 'scadenzario', label: '6. Scadenzario' },
-  { id: 'assistente', label: 'Assistente IA' },
-  { id: 'export', label: '8. Export' },
+interface VoceMenu { id: Pagina; label: string; Icon: (p: { size?: number }) => React.JSX.Element; }
+interface SezioneMenu { titolo: string; voci: VoceMenu[]; }
+
+const SEZIONI: SezioneMenu[] = [
+  {
+    titolo: 'Oggi',
+    voci: [
+      { id: 'dashboard', label: 'Panoramica', Icon: IconHome },
+      { id: 'routine', label: 'Cosa devo fare', Icon: IconChecklist },
+    ],
+  },
+  {
+    titolo: 'I miei dati',
+    voci: [
+      { id: 'profilo', label: 'Profilo', Icon: IconUser },
+      { id: 'cedolini', label: 'Cedolini', Icon: IconDocument },
+      { id: 'presenze', label: 'Presenze', Icon: IconClock },
+      { id: 'contratto', label: 'Contratto', Icon: IconBriefcase },
+    ],
+  },
+  {
+    titolo: 'Spese e detrazioni',
+    voci: [
+      { id: 'spese', label: 'Spese mediche', Icon: IconHeart },
+      { id: 'checklist', label: 'Documenti per il 730', Icon: IconShield },
+    ],
+  },
+  {
+    titolo: 'Scadenze',
+    voci: [
+      { id: 'scadenzario', label: 'Scadenzario', Icon: IconCalendar },
+    ],
+  },
+  {
+    titolo: 'Strumenti',
+    voci: [
+      { id: 'assistente', label: 'Assistente IA', Icon: IconMessage },
+      { id: 'export', label: 'Esporta dati', Icon: IconDownload },
+    ],
+  },
 ];
 
 function App() {
@@ -36,10 +68,16 @@ function App() {
       <aside className="sidebar">
         <h1>FiscAI</h1>
         <nav>
-          {VOCI_MENU.map((v) => (
-            <button key={v.id} className={pagina === v.id ? 'active' : ''} onClick={() => setPagina(v.id)}>
-              {v.label}
-            </button>
+          {SEZIONI.map((sezione) => (
+            <div key={sezione.titolo} className="nav-sezione">
+              <div className="nav-sezione-titolo">{sezione.titolo}</div>
+              {sezione.voci.map((v) => (
+                <button key={v.id} className={pagina === v.id ? 'active' : ''} onClick={() => setPagina(v.id)}>
+                  <v.Icon />
+                  <span>{v.label}</span>
+                </button>
+              ))}
+            </div>
           ))}
         </nav>
       </aside>
