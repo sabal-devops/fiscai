@@ -10,7 +10,7 @@ import type {
 } from './types';
 
 const DB_NAME = 'fiscai-db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -20,6 +20,9 @@ function getDb(): Promise<IDBPDatabase> {
       upgrade(db) {
         if (!db.objectStoreNames.contains('routineCompletamenti')) {
           db.createObjectStore('routineCompletamenti');
+        }
+        if (!db.objectStoreNames.contains('allegatiSpeseMediche')) {
+          db.createObjectStore('allegatiSpeseMediche');
         }
         if (!db.objectStoreNames.contains('profilo')) {
           db.createObjectStore('profilo');
@@ -146,6 +149,31 @@ export async function salvaSpesaMedica(s: SpesaMedica): Promise<void> {
 export async function eliminaSpesaMedica(id: string): Promise<void> {
   const db = await getDb();
   await db.delete('speseMediche', id);
+  await db.delete('allegatiSpeseMediche', id);
+}
+
+// --- Allegati spese mediche (foto/scansione dello scontrino o fattura) ---
+// Salvati come File/Blob direttamente in IndexedDB: restano solo nel browser, mai su GitHub o altrove.
+export interface AllegatoSpesa {
+  nomeFile: string;
+  tipo: string;
+  blob: Blob;
+}
+
+export async function salvaAllegatoSpesa(spesaId: string, file: File): Promise<void> {
+  const db = await getDb();
+  const allegato: AllegatoSpesa = { nomeFile: file.name, tipo: file.type, blob: file };
+  await db.put('allegatiSpeseMediche', allegato, spesaId);
+}
+
+export async function getAllegatoSpesa(spesaId: string): Promise<AllegatoSpesa | undefined> {
+  const db = await getDb();
+  return db.get('allegatiSpeseMediche', spesaId);
+}
+
+export async function eliminaAllegatoSpesa(spesaId: string): Promise<void> {
+  const db = await getDb();
+  await db.delete('allegatiSpeseMediche', spesaId);
 }
 
 // --- Scadenze ---

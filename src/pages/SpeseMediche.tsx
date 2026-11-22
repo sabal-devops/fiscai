@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { SpesaMedica } from '../types';
-import { listaSpeseMediche, salvaSpesaMedica, eliminaSpesaMedica, nuovoId } from '../db';
+import { listaSpeseMediche, salvaSpesaMedica, eliminaSpesaMedica, nuovoId, salvaAllegatoSpesa, getAllegatoSpesa, eliminaAllegatoSpesa } from '../db';
 import { calcolaDetrazioneSpeseMediche } from '../calc/detrazioniMediche';
 
 const CATEGORIE_DETRAIBILI = [
@@ -29,11 +29,40 @@ export function SpeseMediche() {
   const [spese, setSpese] = useState<SpesaMedica[]>([]);
   const [form, setForm] = useState<SpesaMedica | null>(null);
   const [guidaAperta, setGuidaAperta] = useState(false);
+  const [allegatiPresenti, setAllegatiPresenti] = useState<Set<string>>(new Set());
+  const [allegatoFormNome, setAllegatoFormNome] = useState<string | null>(null);
+  const inputAllegatoRef = useRef<HTMLInputElement>(null);
 
   async function ricarica() {
-    setSpese(await listaSpeseMediche());
+    const lista = await listaSpeseMediche();
+    setSpese(lista);
+    const presenti = new Set<string>();
+    for (const s of lista) {
+      if (await getAllegatoSpesa(s.id)) presenti.add(s.id);
+    }
+    setAllegatiPresenti(presenti);
   }
   useEffect(() => { ricarica(); }, []);
+
+  async function apriAllegato(spesaId: string) {
+    const allegato = await getAllegatoSpesa(spesaId);
+    if (!allegato) return;
+    const url = URL.createObjectURL(allegato.blob);
+    window.open(url, '_blank');
+  }
+
+  async function gestisciUploadAllegato(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !form) return;
+    await salvaAllegatoSpesa(form.id, file);
+    setAllegatoFormNome(file.name);
+  }
+
+  async function rimuoviAllegatoForm() {
+    if (!form) return;
+    await eliminaAllegatoSpesa(form.id);
+    setAllegatoFormNome(null);
+  }
 
   function aggiorna<K extends keyof SpesaMedica>(campo: K, valore: SpesaMedica[K]) {
     if (!form) return;
@@ -124,12 +153,12 @@ export function SpeseMediche() {
       <div className="card">
         <div className="toolbar">
           <h2 style={{ margin: 0 }}>Spese mediche</h2>
-          <button className="primary" onClick={() => setForm(spesaVuota())}>+ Aggiungi spesa</button>
+          <button className="primary" onClick={() => { setForm(spesaVuota()); setAllegatoFormNome(null); }}>+ Aggiungi spesa</button>
         </div>
         {spese.length === 0 && <div className="empty-state">Nessuna spesa registrata.</div>}
         {spese.length > 0 && (
           <table>
-            <thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Importo</th><th>Rimborsato</th><th></th></tr></thead>
+            <thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Importo</th><th>Rimborsato</th><th>Allegato</th><th></th></tr></thead>
             <tbody>
               {spese.map((s) => (
                 <tr key={s.id}>
@@ -138,8 +167,13 @@ export function SpeseMediche() {
                   <td>{s.categoria}</td>
                   <td>€{s.importo.toFixed(2)}</td>
                   <td>{s.rimborsatoDaFondoSanitario > 0 ? `€${s.rimborsatoDaFondoSanitario.toFixed(2)}` : '-'}</td>
+                  <td>
+                    {allegatiPresenti.has(s.id)
+                      ? <button className="secondary" onClick={() => apriAllegato(s.id)}>Apri</button>
+                      : '-'}
+                  </td>
                   <td className="row-actions">
-                    <button className="secondary" onClick={() => setForm(s)}>Modifica</button>
+                    <button className="secondary" onClick={async () => { setForm(s); setAllegatoFormNome(allegatiPresenti.has(s.id) ? (await getAllegatoSpesa(s.id))?.nomeFile ?? null : null); }}>Modifica</button>
                     <button className="danger-text" onClick={() => elimina(s.id)}>Elimina</button>
                   </td>
                 </tr>
@@ -174,6 +208,21 @@ export function SpeseMediche() {
             <div className="field">
               <label>Rimborsato dal fondo sanitario (€)</label>
               <input type="number" value={form.rimborsatoDaFondoSanitario} onChange={(e) => aggiorna('rimborsatoDaFondoSanitario', parseFloat(e.target.value) || 0)} />
+            </div>
+          </div>
+          <div className="field" style={{ marginTop: 12 }}>
+            <label>Scontrino/fattura (facoltativo, resta solo nel tuo browser)</label>
+            <input ref={inputAllegatoRef} type="file" accept="image/*,application/pdf" style={{ display: 'none' }} onChange={gestisciUploadAllegato} />
+            <div className="row-actions">
+              <button className="secondary" onClick={() => inputAllegatoRef.current?.click()}>
+                {allegatoFormNome ? 'Sostituisci file' : 'Allega foto/PDF'}
+              </button>
+              {allegatoFormNome && (
+                <>
+                  <span style={{ fontSize: 13, color: 'var(--text-dim)', alignSelf: 'center' }}>{allegatoFormNome}</span>
+                  <button className="danger-text" onClick={rimuoviAllegatoForm}>Rimuovi allegato</button>
+                </>
+              )}
             </div>
           </div>
           <div className="toolbar" style={{ marginTop: 16 }}>
