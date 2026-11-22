@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Scadenza } from '../types';
 import { listaScadenze, salvaScadenza, eliminaScadenza, nuovoId } from '../db';
-import { generaScadenzeStandard, prossimiReminder } from '../calc/scadenzario';
+import { generaScadenzeStandard, prossimiReminder, annoDichiarazioneSuggerita } from '../calc/scadenzario';
 
 function scadenzaVuota(): Scadenza {
   return {
@@ -28,8 +28,8 @@ export function Scadenzario() {
   useEffect(() => { ricarica(); }, []);
 
   async function generaStandard() {
-    const anno = new Date().getFullYear();
-    if (!confirm(`Generare le scadenze fiscali standard per l'anno ${anno}?`)) return;
+    const anno = annoDichiarazioneSuggerita();
+    if (!confirm(`Generare le scadenze per la campagna 730/${anno} (riguarda i redditi percepiti nel ${anno - 1})?`)) return;
     const nuove = generaScadenzeStandard(anno);
     for (const s of nuove) await salvaScadenza(s);
     ricarica();
@@ -81,7 +81,7 @@ export function Scadenzario() {
         <div className="toolbar">
           <h2 style={{ margin: 0 }}>Scadenzario fiscale</h2>
           <div className="row-actions">
-            <button className="secondary" onClick={generaStandard}>Genera scadenze standard anno corrente</button>
+            <button className="secondary" onClick={generaStandard}>Genera scadenze per la prossima campagna 730</button>
             <button className="primary" onClick={() => setForm(scadenzaVuota())}>+ Aggiungi</button>
           </div>
         </div>

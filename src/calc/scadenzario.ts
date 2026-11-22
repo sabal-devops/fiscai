@@ -4,6 +4,19 @@ import { nuovoId } from '../db';
 // Scadenze fiscali standard per un dipendente privato senza partita IVA e senza immobili diversi
 // dall'eventuale abitazione principale. Date indicative annuali (verificare sempre il calendario
 // fiscale ufficiale dell'Agenzia delle Entrate per l'anno in corso, che può differire di pochi giorni).
+//
+// IMPORTANTE: "anno" qui è l'ANNO DI DICHIARAZIONE (es. 730/2027), non l'anno in cui si percepisce
+// il reddito: la CU e il 730 relativi ai redditi di un anno arrivano/si presentano l'anno SUCCESSIVO
+// (CU a marzo, 730 entro settembre). Usare annoDichiarazioneSuggerita() per calcolare quale annata
+// generare in base alla data odierna, invece di usare semplicemente l'anno solare corrente.
+
+// Suggerisce l'anno di dichiarazione rilevante in base a oggi: se la campagna 730 dell'anno corrente
+// è già conclusa (dopo il 30 settembre), la prossima campagna utile è quella dell'anno successivo.
+export function annoDichiarazioneSuggerita(oggi: Date = new Date()): number {
+  const anno = oggi.getFullYear();
+  const fineCampagna = new Date(anno, 8, 30); // 30 settembre (mese 0-based: 8 = settembre)
+  return oggi > fineCampagna ? anno + 1 : anno;
+}
 
 export function generaScadenzeStandard(anno: number): Scadenza[] {
   const base: Omit<Scadenza, 'id' | 'completata'>[] = [
