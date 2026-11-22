@@ -101,6 +101,20 @@ body {
   border-radius: var(--radius);
   padding: 18px 22px;
   margin-bottom: 18px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.barra-dashboard { cursor: pointer; }
+.barra-dashboard rect { transition: fill 0.15s, opacity 0.15s; }
+.barra-dashboard:hover rect { opacity: 0.85; }
+
+.stat-box-cliccabile {
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.stat-box-cliccabile:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .card h2 { margin-top: 0; margin-bottom: 10px; font-size: 17px; font-weight: 600; }
