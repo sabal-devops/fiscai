@@ -34,6 +34,9 @@ export function Assistente() {
 
   if (!impostazioni) return <div className="empty-state">Caricamento...</div>;
 
+  const suPaginaPubblicata = typeof window !== 'undefined'
+    && !['localhost', '127.0.0.1'].includes(window.location.hostname);
+
   return (
     <div>
       <div className="card">
@@ -44,12 +47,14 @@ export function Assistente() {
           Ollama installato e avviato (<a href="https://ollama.com" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)' }}>ollama.com</a>)
           e almeno un modello scaricato (es. <code className="formula" style={{ padding: '1px 6px' }}>ollama pull llama3.2</code>).
         </p>
+        <p style={{ color: 'var(--danger)', fontSize: 13, fontWeight: 600 }}>
+          Funziona solo aprendo FiscAI in locale, non dalla versione pubblicata online (sabal-devops.github.io/fiscai).
+        </p>
         <p style={{ color: 'var(--text-dim)', fontSize: 13 }}>
-          Se usi FiscAI dalla versione pubblicata online e Ollama rifiuta la richiesta, imposta sul tuo PC la
-          variabile d'ambiente <code className="formula" style={{ padding: '1px 6px' }}>OLLAMA_ORIGINS</code> includendo
-          l'indirizzo del sito (es. <code className="formula" style={{ padding: '1px 6px' }}>https://sabal-devops.github.io</code>),
-          poi riavvia Ollama. Se invece usi FiscAI in locale (<code className="formula" style={{ padding: '1px 6px' }}>npm run dev</code>),
-          di solito funziona già senza configurazioni aggiuntive.
+          Il motivo è una protezione del browser (Private Network Access): un sito pubblico HTTPS non può
+          contattare un indirizzo "locale" come localhost, indipendentemente da come configuri Ollama (CORS
+          non basta). Usa il collegamento "FiscAI (con assistente)" sul Desktop, oppure avvia `npm run dev`
+          nella cartella del progetto: lì l'assistente funziona normalmente.
         </p>
         <div className="form-grid">
           <div className="field">
@@ -75,7 +80,17 @@ export function Assistente() {
         <button className="primary" style={{ marginTop: 12 }} onClick={salvaImpostazioniAssistente}>Salva impostazioni</button>
       </div>
 
-      {impostazioni.assistenteAbilitato && (
+      {impostazioni.assistenteAbilitato && suPaginaPubblicata && (
+        <div className="card">
+          <div className="anomalia">
+            Stai usando la versione pubblicata online: da qui l'assistente non può raggiungere Ollama (lo
+            blocca il browser, non è un problema di configurazione). Apri il collegamento "FiscAI (con
+            assistente)" sul Desktop per usarlo.
+          </div>
+        </div>
+      )}
+
+      {impostazioni.assistenteAbilitato && !suPaginaPubblicata && (
         <div className="card">
           <h2>Fai una domanda</h2>
           <p style={{ color: 'var(--text-dim)', fontSize: 13 }}>
