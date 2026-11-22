@@ -114,7 +114,8 @@ export function Export() {
     if (!confirm('Importare questo backup sovrascriverà i dati esistenti con lo stesso id. Continuare?')) return;
     const testo = await file.text();
     await importaTuttoJson(testo);
-    alert('Backup importato. Ricarica la pagina per vedere i dati aggiornati.');
+    alert('Backup importato correttamente. La pagina si ricarica ora per mostrare i dati aggiornati.');
+    window.location.reload();
   }
 
   return (
