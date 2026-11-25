@@ -40,6 +40,9 @@ export function Dashboard() {
 
   const proiezioneIrpefAnnua = cedoliniAnno.length > 0 && profilo ? (irpefVersata / cedoliniAnno.length) * profilo.mensilita : 0;
 
+  const contributiInpsCumulati = cedoliniAnno.reduce((acc, c) => acc + c.contributiInps, 0);
+  const pressioneFiscaleEffettiva = lordoCumulato > 0 ? ((irpefVersata + contributiInpsCumulati) / lordoCumulato) * 100 : 0;
+
   const speseMedicheAnno = spese.filter((s) => new Date(s.data).getFullYear() === annoCorrente);
   const nettoSpeseMedicheAnno = Math.max(
     0,
@@ -85,6 +88,10 @@ export function Dashboard() {
           <div className="stat-box">
             <div className="label">TFR maturato cumulato</div>
             <div className="value">€{tfrCumulato.toFixed(0)}</div>
+          </div>
+          <div className="stat-box" title="(IRPEF + contributi INPS) / totale competenze lorde">
+            <div className="label">Pressione fiscale e contributiva effettiva</div>
+            <div className="value">{pressioneFiscaleEffettiva.toFixed(1)}%</div>
           </div>
           <div className="stat-box">
             <div className="label">Detrazione spese mediche recuperabile</div>

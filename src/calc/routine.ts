@@ -120,6 +120,48 @@ export function calcolaRoutine(
         ? `Hai ancora circa ${-giorniDaScadenza} giorni per scegliere (scadenza ${scadenzaTfr.toLocaleDateString('it-IT')}).`
         : `Finestra scaduta il ${scadenzaTfr.toLocaleDateString('it-IT')} (${giorniDaScadenza} giorni fa): verifica l'esito reale sul cedolino più recente.`,
     });
+
+    // Una tantum: vincolo di restituzione del Bonus Una Tantum (se il contratto lo prevede).
+    // Data di pagamento stimata dal contratto ("dopo 3 mesi dall'assunzione"): verificare la data
+    // esatta sul cedolino in cui è comparso il bonus, questa è solo una stima di riferimento.
+    const stimaPagamentoBonus = new Date(dataAssunzione);
+    stimaPagamentoBonus.setMonth(stimaPagamentoBonus.getMonth() + 3);
+    const fineVincoloBonus = new Date(stimaPagamentoBonus);
+    fineVincoloBonus.setMonth(fineVincoloBonus.getMonth() + 12);
+    const vincoloBonusAttivo = oggi <= fineVincoloBonus;
+    if (vincoloBonusAttivo) {
+      const chiavePeriodoBonus = 'vincolo_bonus_una_tantum';
+      const giorniAllaFine = Math.round((fineVincoloBonus.getTime() - oggi.getTime()) / (1000 * 60 * 60 * 24));
+      voci.push({
+        chiave: 'vincolo_bonus_una_tantum',
+        chiavePeriodo: chiavePeriodoBonus,
+        titolo: 'Attenzione: vincolo di restituzione sul Bonus Una Tantum',
+        cadenza: 'una_tantum',
+        spiegazione: 'Se il tuo contratto prevede un bonus una tantum di ingresso, di norma è condizionato alla permanenza in azienda per 12 mesi dal pagamento: se ti dimetti o l\'azienda recede prima di questa data, potresti dover restituire l\'intero importo (anche tramite trattenuta su stipendio/TFR).',
+        azione: 'Se stai valutando di cambiare lavoro prima di questa data, verifica l\'importo esatto e la data di pagamento sul tuo contratto/cedolino prima di decidere: potrebbe cambiare la convenienza economica del cambio.',
+        fatto: completamenti.has(chiavePeriodoBonus),
+        togglabile: true,
+        dettaglioStato: `Vincolo stimato fino al ${fineVincoloBonus.toLocaleDateString('it-IT')} circa (${giorniAllaFine} giorni), basato su un pagamento stimato 3 mesi dopo l'assunzione. Verifica la data reale sul cedolino in cui hai ricevuto il bonus.`,
+      });
+    }
+
+    // Una tantum, informativa: fine del periodo di prova (tipicamente 6 mesi, verificare il proprio contratto).
+    const finePeriodoProva = new Date(dataAssunzione);
+    finePeriodoProva.setMonth(finePeriodoProva.getMonth() + 6);
+    const giorniDaFineProva = Math.round((oggi.getTime() - finePeriodoProva.getTime()) / (1000 * 60 * 60 * 24));
+    if (giorniDaFineProva >= 0 && giorniDaFineProva <= 30) {
+      voci.push({
+        chiave: 'fine_periodo_prova',
+        chiavePeriodo: 'fine_periodo_prova',
+        titolo: 'Periodo di prova terminato',
+        cadenza: 'una_tantum',
+        spiegazione: 'Durante il periodo di prova (tipicamente 6 mesi, verifica il tuo contratto) entrambe le parti possono recedere senza preavviso né motivazione. Dopo questa data il rapporto è a tutti gli effetti consolidato.',
+        azione: 'Nessuna azione richiesta: è solo una conferma. Controlla il tuo contratto se hai dubbi sulla durata esatta.',
+        fatto: completamenti.has('fine_periodo_prova'),
+        togglabile: true,
+        dettaglioStato: `Terminato il ${finePeriodoProva.toLocaleDateString('it-IT')} (${giorniDaFineProva} giorni fa).`,
+      });
+    }
   }
 
   // Annuale: aggiornare il profilo se cambia qualcosa
