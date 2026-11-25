@@ -83,6 +83,12 @@ export function Presenze() {
             la sola disponibilità) ha un campo a parte più sotto: inserisci l'importo che ti comunica l'azienda
             via email, non va stimato.
           </p>
+          <p className="card-sottotitolo">
+            Puoi inserire anche un mese <strong>futuro</strong> (non ancora in busta paga) per pianificare gli
+            straordinari che prevedi di fare: la Panoramica userà subito questi dati per stimarti l'effetto
+            fiscale a fine anno e avvisarti se ti stai avvicinando al limite di ore CCNL, prima che tu riceva
+            il cedolino.
+          </p>
           {presenze.length === 0 && <div className="empty-state">Nessuna presenza inserita.</div>}
           {presenze.map((p) => {
             const cedolinoMese = cedolini.find((c) => c.mese === p.mese && c.anno === p.anno);

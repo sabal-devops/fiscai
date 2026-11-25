@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { Cedolino, Profilo, SpesaMedica, Scadenza } from '../types';
-import { getProfilo, listaCedolini, listaSpeseMediche, listaScadenze } from '../db';
+import type { Cedolino, Profilo, SpesaMedica, Scadenza, Presenza } from '../types';
+import { getProfilo, listaCedolini, listaSpeseMediche, listaScadenze, listaPresenze } from '../db';
 import { calcolaDetrazioneSpeseMediche } from '../calc/detrazioniMediche';
 import { prossimiReminder } from '../calc/scadenzario';
 import { analizzaCedolino } from '../calc/anomalie';
+import { calcolaOreStraordinarioAnno, calcolaProiezioneFiscaleAnnuale, LIMITE_STRAORDINARIO_ANNUO_OLTRE_200_DIP } from '../calc/proiezioneAnnuale';
 
 const MESI = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
 const MESI_ESTESI = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
@@ -13,16 +14,18 @@ export function Dashboard() {
   const [cedolini, setCedolini] = useState<Cedolino[]>([]);
   const [spese, setSpese] = useState<SpesaMedica[]>([]);
   const [scadenze, setScadenze] = useState<Scadenza[]>([]);
+  const [presenze, setPresenze] = useState<Presenza[]>([]);
   const [meseSelezionato, setMeseSelezionato] = useState<string | null>(null);
   const [dettaglioIrpefAperto, setDettaglioIrpefAperto] = useState(false);
 
   useEffect(() => {
-    Promise.all([getProfilo(), listaCedolini(), listaSpeseMediche(), listaScadenze()]).then(
-      ([p, c, s, sc]) => {
+    Promise.all([getProfilo(), listaCedolini(), listaSpeseMediche(), listaScadenze(), listaPresenze()]).then(
+      ([p, c, s, sc, pr]) => {
         setProfilo(p);
         setCedolini(c);
         setSpese(s);
         setScadenze(sc);
+        setPresenze(pr);
       },
     );
   }, []);
@@ -54,6 +57,9 @@ export function Dashboard() {
 
   const maxNetto = Math.max(1, ...cedoliniAnno.map((c) => c.nettoPagato));
   const cedolinoSelezionato = anomaliePerMese.find((x) => x.cedolino.id === meseSelezionato);
+
+  const oreStraordinario = calcolaOreStraordinarioAnno(presenze, annoCorrente);
+  const proiezioneFiscale = calcolaProiezioneFiscaleAnnuale(profilo, cedolini, presenze, annoCorrente);
 
   function selezionaMese(id: string) {
     setMeseSelezionato(meseSelezionato === id ? null : id);
@@ -166,6 +172,46 @@ export function Dashboard() {
               <div key={i} className="anomalia" style={{ marginTop: 10 }}>{a}</div>
             ))}
           </div>
+        )}
+      </div>
+
+      <div className="card">
+        <h2>Straordinari e proiezione fiscale {annoCorrente}</h2>
+        <p className="card-sottotitolo">
+          Per vedere l'effetto di straordinari futuri prima ancora che arrivi il cedolino, inserisci una
+          presenza anche per un mese non ancora passato in "Presenze": questa proiezione la userà subito.
+        </p>
+        <div className="stat-grid">
+          <div className="stat-box">
+            <div className="label">Ore di straordinario nell'anno</div>
+            <div className="value">{oreStraordinario.oreTotaliAnno.toFixed(1)} <span style={{ fontSize: 13, color: 'var(--text-dim)' }}>/ {LIMITE_STRAORDINARIO_ANNUO_OLTRE_200_DIP} limite CCNL</span></div>
+          </div>
+          {proiezioneFiscale.disponibile && (
+            <div className="stat-box">
+              <div className="label">Imponibile annuo stimato</div>
+              <div className="value">€{proiezioneFiscale.imponibileAnnuoStimato.toFixed(0)}</div>
+            </div>
+          )}
+        </div>
+        <div
+          className={
+            oreStraordinario.esito === 'superato' ? 'anomalia'
+              : oreStraordinario.esito === 'attenzione' ? 'anomalia'
+              : 'badge ok'
+          }
+          style={{ marginTop: 10, display: 'block' }}
+        >
+          {oreStraordinario.messaggio}
+        </div>
+        {proiezioneFiscale.disponibile ? (
+          <div
+            className={proiezioneFiscale.direzioneConguaglio === 'debito' ? 'anomalia' : proiezioneFiscale.direzioneConguaglio === 'credito' ? 'badge ok' : 'badge ok'}
+            style={{ marginTop: 10, display: 'block' }}
+          >
+            {proiezioneFiscale.messaggio}
+          </div>
+        ) : (
+          <div className="empty-state">{proiezioneFiscale.messaggio}</div>
         )}
       </div>
 
